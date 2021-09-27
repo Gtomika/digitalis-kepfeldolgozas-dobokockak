@@ -1,6 +1,6 @@
 ## Kód
 
-Itt található a **Python + OpenCV** segítségével készített kódbázis.
+Itt található a **Python + OpenCV** segítségével készített kódbázis. A GUI a *PyQt5* keretrendszerrel készül.
 
 Mindenki olyan fejlesztőkörnyezetet használ amilyet csak akar, de a fejlesztőkörnyezet specifikus 
 fájlokat/mappákat rakja a *.gitignore*-ba. Például *Visual Studio Code* esetére a 
