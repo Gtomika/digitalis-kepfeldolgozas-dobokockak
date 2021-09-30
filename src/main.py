@@ -1,18 +1,24 @@
-from PyQt5 import QtWidgets
+from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import sys
+import guiEvents
 
-def main():
-    application = QApplication(sys.argv)
-    window = QMainWindow()
-    window.setGeometry(100, 100, 300, 300)
-    window.setWindowTitle('Dobókockák')
+# Saját ablak osztály
+class MyWindow(QMainWindow):
+    def __init__(self):
+        super(MyWindow, self).__init__()
+        ui = uic.loadUi('window.ui', self) # A GUI-t tartalmazó fájl betöltése
+        self.attachEvents(ui) # események hozzáadása
+        self.show() # mutatás
 
-    label = QtWidgets.QLabel(window)
-    label.setText('Helló!')
-    label.move(10,10)
+    # Csatolja az eseményeket a gombokhoz, szövegekhez.
+    def attachEvents(self, ui): 
+        guiEvents.attachEvents(ui)
 
-    window.show()
-    sys.exit(application.exec_())
+# A main függvény
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MyWindow()
+    sys.exit(app.exec_())
 
-main()
+
