@@ -7,12 +7,13 @@ import guiEvents
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        ui = uic.loadUi('window.ui', self) # A GUI-t tartalmazó fájl betöltése
+        ui: QMainWindow = uic.loadUi('window.ui', self) # A GUI-t tartalmazó fájl betöltése
         self.attachEvents(ui) # események hozzáadása
+        self.setAcceptDrops(True)
         self.show() # mutatás
 
     # Csatolja az eseményeket a gombokhoz, szövegekhez.
-    def attachEvents(self, ui): 
+    def attachEvents(self, ui: QMainWindow): 
         guiEvents.attachEvents(ui)
 
 # A main függvény
