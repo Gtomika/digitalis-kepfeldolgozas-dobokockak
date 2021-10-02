@@ -18,18 +18,18 @@ de ha más néven vagy máshol hozzátok létre a virtuális környezetet, akkor
 A projekt függőségei *pip3* segítségével vannak kezelve. Például egy könvtár/csomag így telepíthető.
 
 ```
-pip3 install [csomag neve]
+python -m install [csomag neve]
 ```
 
 A projekt függőségei és ezek verziói a *requirements.txt*-ben vannak felsorolva. 
 Ha új függőséget húz be valaki, akkor frissítse ezt a fájlt, hogy a többiek is tudják futtatni a kódot:
 
 ```
-pip3 freeze > requirements.txt
+python -m pip freeze > requirements.txt
 ```
 
 Az összes függőséget így lehet telepíteni a *requirements.txt* alapján:
 
 ```
-pip3 install -r requirements.txt
+python -m pip install -r requirements.txt
 ```

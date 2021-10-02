@@ -15,6 +15,32 @@ A cél olyan program készítése, ami 2 dobókockát mutató képen meg tudja s
 
 A projektet **Python és OpenCV** használatával készítjük el.
 
+### Letöltés és futtatás
+
+Letöltés, például *git clone* segítségével:
+
+```
+git clone https://github.com/Gtomika/digitalis-kepfeldolgozas-dobokockak.git
+```
+
+Belépés az *src* mappába ahol a forrásfájlok vannak:
+
+```
+cd digitalis-kepfeldolgozas-dobokockak/src
+```
+
+Függőségek telepítése:
+
+```
+python -m pip install -r requirements.txt
+```
+
+Futtatás:
+
+```
+python main.py
+```
+
 ### Feladatkiosztás
 
 Az itt látható részfeladatokat osztottuk fel egymás között.
