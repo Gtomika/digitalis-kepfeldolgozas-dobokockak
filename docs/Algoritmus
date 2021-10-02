@@ -1,0 +1,17 @@
+Egy képen látható két dobókocka, a dobás eredményét kell detektálnunk
+
+Két fő lépésből álljon a program:
+•	detektálni a négyzetet minden kockán
+•	minden egyes négyzetben detektálni a pöttyöket és megszámolni azokat
+
+Bővebben kifejtve:
+	inputként a program által feldolgozott képeket használunk
+	a képeken Canny éldetektálást alkalmazunk
+	megnézzük, a feldolgozott képeken az éldetektálás hatékonyságát
+	a négyzetek detektálásához kontúrokat keresünk az éldetektálás eredményképén, és pl minAreaRect funkció segítségével megkereshetjük az egyes kontúrok minimális területű téglalapját
+	megnézzük a négyzetdetektálás eredményét az eredeti input képekre helyezve, annak érdekében, hogy megfelelően választhassuk meg a paramétereket
+	a kockán látható pontok detektálásához, először mindkét kockából a kontúrok segítségével kinyerjük a felső négyzetlap képét
+	következőkben ezeken a képeken meghatározzuk a pontok kontúrjait (miután kikísérleteztük a megfelelő paramétereket)
+	detektáljuk és megszámoljuk a köröket
+
+Ez működhet, ha a dobókockák nem érintkeznek egymással
