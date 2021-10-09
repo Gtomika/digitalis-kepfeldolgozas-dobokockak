@@ -1,4 +1,4 @@
-Első megbeszélés - szept. 25
+Első megbeszélés - szept. 25.
 
 Jelen volt:
   Gáspár Tamás
@@ -14,7 +14,26 @@ Kiosztott feladatok:
   Tamás: GUI elkészítése, tesztelés
   Viktória: képek gyűjtése és osztályozása, képek előfeldolgozása
   Kornélia: számoló algoritmus kitalálása, csapatmunka dokumentálása, jegyző
-  (?) Valentin: számoló algoritmus implementálása - még nem elfogadott
+  Valentin: számoló algoritmus implementálása
 
 Következő megbeszélés időpontjának kitűzése:
   Október 2. szombat délután 6 óra
+
+
+Második megbeszélés - okt. 2.
+
+Jelen volt:
+  Gáspár Tamás
+  Takács Viktória
+  Nagy-Pál Kornélia
+  Hegedűs Valentin Dániel
+
+Megbeszélés során lezajlott:
+  Számoló algoritmus megtárgyalása
+  
+
+Harmadik megbeszélés - okt. 9.
+
+Jelen volt:
+
+
