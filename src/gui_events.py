@@ -51,7 +51,7 @@ def onMembersClicked():
 class MembersDialog(QDialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi('members_dialog.ui', self)
+        uic.loadUi('ui/members_dialog.ui', self)
 
 # Hozzáadja az eseményeket azokhoz a gombokhoz amikkel képet lehet választani
 def attachFileSelectEvents(ui: QMainWindow):
