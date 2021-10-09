@@ -29,11 +29,18 @@ Jelen volt:
   Hegedűs Valentin Dániel
 
 Megbeszélés során lezajlott:
-  Számoló algoritmus megtárgyalása
+  Kiosztott feladatokban elért eredmények egyeztetése
+  Képek előkészítése
   
 
 Harmadik megbeszélés - okt. 9.
 
 Jelen volt:
+  Gáspár Tamás
+  Takács Viktória
+  Nagy-Pál Kornélia
+  Hegedűs Valentin Dániel
 
+Megbeszélés során zajlott:
+  Számláló algoritmus implementálása
 
