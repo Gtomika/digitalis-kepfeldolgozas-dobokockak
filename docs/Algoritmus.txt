@@ -1,3 +1,5 @@
+Első verzió:
+
 Egy képen látható két dobókocka, a dobás eredményét kell detektálnunk
 
 Két fő lépésből álljon a program:
@@ -15,3 +17,20 @@ Bővebben kifejtve:
 	detektáljuk és megszámoljuk a köröket
 
 Ez működhet, ha a dobókockák nem érintkeznek egymással
+
+
+Második verzió:
+
+Három fő lépésünk van:
+	kockák elszeparálása egymástól
+	felső négyzetlap detektálása
+	körök megszámolása
+
+Kockákat watershed segítségével különítsük el egymástól.
+
+Felső négyzetlap detektálása a sarkok pontszerű detektálásával aztán a legfelső pont vagy a négyzetek középpontja alapján határozni meg a felső lapot.
+
+Körök detektálása:
+	HoughCircle
+	findContours
+
