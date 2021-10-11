@@ -41,6 +41,12 @@ Futtatás:
 python main.py
 ```
 
+Tesztelő program futtatása:
+
+```
+python test_main.py
+```
+
 ### Feladatkiosztás
 
 Az itt látható részfeladatokat osztottuk fel egymás között.

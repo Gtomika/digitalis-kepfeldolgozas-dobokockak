@@ -1,6 +1,6 @@
 ## Kód
 
-Itt található a **Python + OpenCV** segítségével készített kódbázis. A GUI a *PyQt5* keretrendszerrel készül.
+Itt található a **Python + OpenCV** segítségével készített kódbázis. A GUI a **PyQt5** keretrendszerrel készül.
 
 Mindenki olyan fejlesztőkörnyezetet használ amilyet csak akar, de a fejlesztőkörnyezet specifikus 
 fájlokat/mappákat rakja a *.gitignore*-ba. Például *Visual Studio Code* esetére a 
@@ -15,7 +15,7 @@ de ha más néven vagy máshol hozzátok létre a virtuális környezetet, akkor
 
 ### Függőségek
 
-A projekt függőségei *pip3* segítségével vannak kezelve. Például egy könvtár/csomag így telepíthető.
+A projekt függőségei *pip* segítségével vannak kezelve. Például egy könvtár/csomag így telepíthető.
 
 ```
 python -m install [csomag neve]
