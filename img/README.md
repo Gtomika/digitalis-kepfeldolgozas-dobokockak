@@ -12,5 +12,5 @@ A kiértékelés a *values.txt* fájlba kerül, aminek minden sora így néz ki:
 Például:
 
 ```
-dobokockak1.png;7
+IMG_20211009_164826;3
 ```
