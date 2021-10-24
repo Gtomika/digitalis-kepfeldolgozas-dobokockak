@@ -44,3 +44,18 @@ Jelen volt:
 Megbeszélés során zajlott:
   Számláló algoritmus implementálása
 
+
+Negyedik megbeszélés - okt. 23.
+
+Jelen volt:
+  Gáspár Tamás
+  Takács Viktória
+  Nagy-Pál Kornélia
+  Hegedűs Valentin Dániel
+
+Megbeszélés során zajlott:
+  Eddig implementált algoritmus megtárgyalása
+  Kiosztott feladat a program képfeldolgozás implementációjának javítására - Kornélia
+  Kiosztott feladat a tesztképek előkészítése teszteléshez - Viktória
+  
+  
