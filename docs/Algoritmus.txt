@@ -36,4 +36,4 @@ Körök detektálása:
 
 Harmadik verzió (végleges):
 
-
+A számoló algoritmusunk, még nem teljes, de röviden a következőképpen működik. A program először a körök detektálását végezné el, majd a köröket csoportosítja egymástól való távolságuk alapján, így meghatározva a különböző lapjait a kockáknak. Ezt követően a program úgy határozza meg a két dobókocka felső lapjait, hogy a csoportosított pontok közül kiválasztja azokat melyek középpontjai a legmagasabb pozícióban találhatóak. Végezetül megszámolja a két felső lap pontjait.
