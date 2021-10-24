@@ -34,3 +34,6 @@ Körök detektálása:
 	HoughCircle
 	findContours
 
+Harmadik verzió (végleges):
+
+
