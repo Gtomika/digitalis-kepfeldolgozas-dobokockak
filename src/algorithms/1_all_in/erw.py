@@ -4,13 +4,19 @@ import cv2
 import numpy as np
 import os
 
-IMAGES_DIR = "input_images"
+# Nálam nem működött a relatív útvonal, mert a jelenlegi munkakönyvtár nem ez a 
+# a mappa volt, hanem az src mappa. Átírtam úgy az útvonalakat, hogy ott keressék a 
+# fájlokat és mappákat, ahol EZ a forrásfájl van.
+# Továbbá a / jel helyett mindhol a join függvényt írtam - Tamás
+fileDir = os.path.dirname(os.path.realpath(__file__))
+
+IMAGES_DIR = os.path.join(fileDir, 'input_images')
 
 def get_input_image_paths(dir):
     paths = []
     for file in listdir(dir):
         if isfile(join(dir, file)):
-            paths.append(dir + "/" + file)
+            paths.append(os.path.join(dir, file))
     return paths
 
 def read_images(image_paths):
@@ -129,8 +135,18 @@ def get_image_palette(image):
 
 def process_image(index, image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 2.0)
-    edges = cv2.Canny(blurred, 4, 100, None, 3)
+    blurred = cv2.GaussianBlur(gray, (5, 5),  sigmaX=1.0, sigmaY=1.0)
+
+    """im_thresh = np.ndarray(blurred.shape, blurred.dtype)
+    im_thresh[blurred >= 95] = 255
+    im_thresh[blurred < 95] = 0"""
+
+    edges = cv2.Canny(blurred, 3, 200, None, 3)
+    #edges = cv2.Canny(im_thresh, 3, 200, None, 3)
+
+    #cv2.imshow(str(index) + "# im_thresh", im_thresh)
+    #cv2.imshow(str(index) + "# blurred", blurred)
+    cv2.imshow(str(index) + "# edges", edges)
 
 
     _, thresh = cv2.threshold(edges, 10, 255, cv2.THRESH_BINARY)
@@ -147,9 +163,8 @@ def process_image(index, image):
 
 
     # Display
-    cv2.imshow(str(index) + "# Image", image)
-    cv2.imshow(str(index) + "# Image2", edges)
-
+    #cv2.imshow(str(index) + "# Image", image)
+    #cv2.imshow(str(index) + "# Image2", edges)
 
 def sizing_images(path): # Viki
     for root, dirs, files in os.walk(path):
