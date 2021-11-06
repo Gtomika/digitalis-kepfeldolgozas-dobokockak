@@ -99,7 +99,7 @@ class Loader:
         self._processors.append(processor)
 
 
-    def clear_all_processor():
+    def clear_all_processor(self):
         self._processors = []
         
         

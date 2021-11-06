@@ -25,13 +25,13 @@ class Dices:
     def match_templates(self, templates_dir, image, threshold = 0.4):
         items = []
         for file in listdir(templates_dir):
-            if isfile(join(templates_dir, file)):
-                path = templates_dir + "/" + file
+            path = join(templates_dir, file)
+            if isfile(path):
                 matches, template = self.match_template(path, image, threshold)
                 items.append((matches, template))
 
         
-
+        # Ezt a részt tényleg nem értem - Tamás
         print(len(items))
 
         self._loader.load_image("preprocessed/Image_1_prepocessed.jpg")
@@ -89,7 +89,7 @@ class Dices:
         return shapes
 
 
-    def process(self):
+    def process(self, templatesPath):
         """self._loader.to_grayscale()
         self._loader.adaptive_threshold()
 
@@ -102,7 +102,8 @@ class Dices:
         self._loader.show_image(124, self._loader.images[0], "rqetwets", False)"""
 
         self._loader.to_grayscale()
-        self.match_templates("templates", self._loader.images[0])
+        result = self.match_templates(templatesPath, self._loader.images[0])
+        print(result)
 
     def find_K_nearest(self):
         pass

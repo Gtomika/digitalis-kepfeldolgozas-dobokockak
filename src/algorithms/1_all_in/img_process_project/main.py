@@ -3,8 +3,15 @@ from os.path import isfile, join
 import cv2
 import numpy as np
 import math
+import os
 
-IMAGES_DIR = "input_images"
+# Nálam nem működött a relatív útvonal, mert a jelenlegi munkakönyvtár nem ez a 
+# a mappa volt, hanem az src mappa. Átírtam úgy az útvonalakat, hogy ott keressék a 
+# fájlokat és mappákat, ahol EZ a forrásfájl van.
+# Továbbá a / jel helyett mindhol a join függvényt írtam - Tamás
+fileDir = os.path.dirname(os.path.realpath(__file__))
+
+IMAGES_DIR = os.path.join(fileDir, "input_images")
 MIN_LENGTH = 30
 MAX_LENGTH = 100
 CIRCULA = 0.06
@@ -13,7 +20,7 @@ def get_input_image_paths(dir):
     paths = []
     for file in listdir(dir):
         if isfile(join(dir, file)):
-            paths.append(dir + "/" + file)
+            paths.append(os.path.join(dir, file))
     return paths
 
 def read_images(image_paths):

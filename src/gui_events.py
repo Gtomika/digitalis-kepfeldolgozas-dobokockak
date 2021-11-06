@@ -6,6 +6,13 @@ from PyQt5.QtWidgets import QAction, QApplication, QDialog, QFileDialog, QLabel,
 from PyQt5 import uic
 import threading
 import time
+import os
+
+# Nálam nem működött a relatív útvonal, mert a jelenlegi munkakönyvtár nem ez a 
+# a mappa volt, hanem az src mappa. Átírtam úgy az útvonalakat, hogy ott keressék a 
+# fájlokat és mappákat, ahol EZ a forrásfájl van.
+# Továbbá a / jel helyett mindhol a join függvényt írtam - Tamás
+fileDir = os.path.dirname(os.path.realpath(__file__))
 
 # kép megjelenítő
 class ImagePreview(QLabel):
@@ -51,7 +58,7 @@ def onMembersClicked():
 class MembersDialog(QDialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi('ui/members_dialog.ui', self)
+        uic.loadUi(os.path.join(fileDir, 'ui', 'members_dialog.ui'), self)
 
 # Hozzáadja az eseményeket azokhoz a gombokhoz amikkel képet lehet választani
 def attachFileSelectEvents(ui: QMainWindow):
