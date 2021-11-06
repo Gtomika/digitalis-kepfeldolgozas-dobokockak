@@ -149,7 +149,17 @@ def process_image(index, image):
     cv2.imshow(str(index) + "# Image", image)
     cv2.imshow(str(index) + "# Image2", edges)
 
-
+def sizing_images(path): # Viki
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            img = cv2.imread(os.path.join(root, name))
+            print(img.shape)
+            img = cv2.resize(img, (img.shape[1]//4, img.shape[0]//4))
+            new_root = root.replace('Tesztkepek', 'Tesztkepek_resized')
+            if not os.path.exists(new_root):
+                os.makedirs(new_root)
+            cv2.imwrite(os.path.join(new_root, name), img)
+            print(root, name)
 
 
 if __name__ == '__main__':
