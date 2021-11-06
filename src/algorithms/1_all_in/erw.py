@@ -3,6 +3,7 @@ from os.path import isfile, join
 import cv2
 import numpy as np
 import os
+import math
 
 # Nálam nem működött a relatív útvonal, mert a jelenlegi munkakönyvtár nem ez a 
 # a mappa volt, hanem az src mappa. Átírtam úgy az útvonalakat, hogy ott keressék a 
@@ -10,7 +11,7 @@ import os
 # Továbbá a / jel helyett mindhol a join függvényt írtam - Tamás
 fileDir = os.path.dirname(os.path.realpath(__file__))
 
-IMAGES_DIR = os.path.join(fileDir, 'input_images')
+IMAGES_DIR = os.path.join(fileDir, 'input_images_legeslegujabb')
 
 def get_input_image_paths(dir):
     paths = []
@@ -136,12 +137,13 @@ def get_image_palette(image):
 def process_image(index, image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5),  sigmaX=1.0, sigmaY=1.0)
+    return blurred
 
     """im_thresh = np.ndarray(blurred.shape, blurred.dtype)
     im_thresh[blurred >= 95] = 255
     im_thresh[blurred < 95] = 0"""
 
-    edges = cv2.Canny(blurred, 3, 200, None, 3)
+    """edges = cv2.Canny(blurred, 3, 200, None, 3)
     #edges = cv2.Canny(im_thresh, 3, 200, None, 3)
 
     #cv2.imshow(str(index) + "# im_thresh", im_thresh)
@@ -157,7 +159,7 @@ def process_image(index, image):
     mask = np.zeros((h+2, w+2), np.uint8)
     cv2.floodFill(im_floodfill, mask, (3, 3), 255)
     im_floodfill_inv = cv2.bitwise_not(im_floodfill)
-    im_out = thresh | im_floodfill_inv
+    im_out = thresh | im_floodfill_inv"""
 
     
 
@@ -178,24 +180,44 @@ def sizing_images(path): # Viki
             cv2.imwrite(os.path.join(new_root, name), img)
             print(root, name)
 
+def count_points(img):
+    _, thresh = cv2.threshold(img, -1, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    point_count = 0
+    for cnt in contours:
+        area = cv2.contourArea(cnt, False)
+        leng = cv2.arcLength(cnt, False)
+        if area != 0.0:
+            komp = math.pow(leng, 2) / area
+            cirku = 1 / komp
+            if cirku > 0.06 and leng > 30:
+                cont = cv2.drawContours(img, [cnt], 0, (0, 255, 0), 3)
+                point_count += 1
+    cv2.imshow(str(index) + "# contur", cont)
+    return point_count
+
 
 if __name__ == '__main__':
     image_paths = get_input_image_paths(IMAGES_DIR)
     print("Images: " + str(image_paths))
     
     images = read_images(image_paths)
+    #cv2.imshow("adf", images[0])
 
     avg_image_size = get_avg_image_size(images)
     print("Average image size: " + str(avg_image_size))
 
     images = resize_images(images, width = avg_image_size[1], height = avg_image_size[0])
     
-    
     for index, image in enumerate(images):
         """if index == 1:
             break"""
-        process_image(index + 1, image)
-    
-    
+        blur = process_image(index + 1, image)
+        #cv2.imshow("img", image)
+        points = count_points(blur)
+        print(str(index) + "# pontok", points)
+
+
+
     cv2.waitKey(0)
     cv2.destroyAllWindows()
