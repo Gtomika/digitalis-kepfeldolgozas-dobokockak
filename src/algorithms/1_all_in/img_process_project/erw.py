@@ -128,8 +128,18 @@ def get_image_palette(image):
 
 def process_image(index, image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 2.0)
-    edges = cv2.Canny(blurred, 4, 100, None, 3)
+    blurred = cv2.GaussianBlur(gray, (5, 5),  sigmaX=1.0, sigmaY=1.0)
+
+    """im_thresh = np.ndarray(blurred.shape, blurred.dtype)
+    im_thresh[blurred >= 95] = 255
+    im_thresh[blurred < 95] = 0"""
+
+    edges = cv2.Canny(blurred, 3, 200, None, 3)
+    #edges = cv2.Canny(im_thresh, 3, 200, None, 3)
+
+    #cv2.imshow(str(index) + "# im_thresh", im_thresh)
+    #cv2.imshow(str(index) + "# blurred", blurred)
+    cv2.imshow(str(index) + "# edges", edges)
 
 
     _, thresh = cv2.threshold(edges, 10, 255, cv2.THRESH_BINARY)
@@ -146,8 +156,8 @@ def process_image(index, image):
 
 
     # Display
-    cv2.imshow(str(index) + "# Image", image)
-    cv2.imshow(str(index) + "# Image2", edges)
+    #cv2.imshow(str(index) + "# Image", image)
+    #cv2.imshow(str(index) + "# Image2", edges)
 
 
 
