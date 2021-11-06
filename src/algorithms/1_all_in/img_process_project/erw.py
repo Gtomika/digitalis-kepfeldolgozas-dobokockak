@@ -2,6 +2,7 @@ from os import listdir
 from os.path import isfile, join
 import cv2
 import numpy as np
+import os
 
 IMAGES_DIR = "input_images"
 
