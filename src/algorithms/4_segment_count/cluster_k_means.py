@@ -13,8 +13,8 @@ def create_blob_detector():
     max_threshold = 200                     
     min_area = 50                          
     max_area = 100
-    min_circularity = .3
-    min_inertia_ratio = .4
+    min_circularity = .1
+    min_inertia_ratio = .1
 
     params = cv2.SimpleBlobDetector_Params()  
     params.filterByArea = False
@@ -100,7 +100,7 @@ def count_value_k_means(preprocessed_image, original_image, masks, index = 0, di
     
     if(display):
         # talált pontok rajzolása
-        image_with_keypoints = cv2.drawKeypoints(original_image, total_keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        image_with_keypoints = cv2.drawKeypoints(original_image, total_keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         # talált K-means középpontok rajzolása
         for center_point in total_centerpoints:
             px = int(center_point[0])

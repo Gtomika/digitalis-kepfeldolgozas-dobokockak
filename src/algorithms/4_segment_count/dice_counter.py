@@ -5,6 +5,7 @@ import numpy as np
 from rectangle import Rectangle
 from cluster_k_means import count_value_k_means
 from cluster_hierarchical import count_value_hierarchical
+from brightness_based import count_value_brightness_based
 
 """
 Források:
@@ -26,15 +27,16 @@ MODEL_PATH = path.join(fileDir, 'neural_network_parameters', 'frozen_inference_g
 # Ez a fájl tartalmazza az objektum detektáló neurális háló konfigurációját
 CONFIG_PATH = path.join(fileDir, 'neural_network_parameters', 'mask_rcnn_inception_v2_coco_2018_01_28.pbtxt')
 # Kijelölőszínek, véletlen
-HIGHLIGHT_COLORS = np.random.randint(125, 255, (80, 3))
+HIGHLIGHT_COLORS = np.random.randint(125, 255, (120, 3))
 
 # Előfeldolgozást végez a képen, majd visszaadja az előfeldolgozott 
 # képet, amit utána be lehet adni az algoritmusnak.
 def preprocess_image(image, index = 0, display = False):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
     #image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
     image = cv2.erode(image, kernel)
+    image = cv2.blur(image, (5,5))
     if(display):
         cv2.imshow(str(index) + '. image preprocessed', image)
     return image
@@ -117,7 +119,10 @@ if __name__ == '__main__':
     # A képek feldolgozása
     for index, image in enumerate(images):
        # Átméretezés
-       image = cv2.resize(image, (650, 550)) 
+       image = cv2.resize(image, (650, 550))
+       # fényesítés
+       # alpha érték tologatásával lehet egyes képeken javítani, de nincs olyan ami mindenhol jó lenne
+       image = cv2.convertScaleAbs(image, alpha=1.2, beta=0)
        # szegmentálás, ha display-t True-ra állítjátok akkor mutat szép részeredmény képet
        #object_masks = []
        object_masks = segment_dices(model, image, index, display=False)
@@ -133,7 +138,9 @@ if __name__ == '__main__':
        # Ez csinálja a K-means módszerrel, nem túl jól
        #count = count_value_k_means(preprocessed, image, object_masks, index, display=True)
        # Ez csinálja a hierarchikus klaasterezés módszerrel, nem túl jól
-       count = count_value_hierarchical(preprocessed, image, object_masks, index, display=True)
+       #count = count_value_hierarchical(preprocessed, image, object_masks, index, display=True)
+       # Ez csinálja fényesség alapján
+       count = count_value_brightness_based(preprocessed, image, object_masks, index, display=True)
        # Eredmény
        print(str(index) + '. kép értéke: ' + str(count))
 
