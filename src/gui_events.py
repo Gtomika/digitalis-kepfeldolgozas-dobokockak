@@ -1,12 +1,13 @@
 import webbrowser
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor, QPixmap
+from PyQt5.QtGui import QPixmap
 
-from PyQt5.QtWidgets import QAction, QApplication, QDialog, QFileDialog, QLabel, QMainWindow, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QDialog, QFileDialog, QLabel, QMainWindow, QPushButton, QVBoxLayout
 from PyQt5 import uic
 import threading
 import time
 import os
+import algorithms.segment_count.dice_counter
 
 # Nálam nem működött a relatív útvonal, mert a jelenlegi munkakönyvtár nem ez a 
 # a mappa volt, hanem az src mappa. Átírtam úgy az útvonalakat, hogy ott keressék a 
@@ -29,7 +30,6 @@ class ImagePreview(QLabel):
 
 # Megkapja a betöltött GUI-t és hozzáadja az eseményeket (kattintás, stb...)
 def attachEvents(ui: QMainWindow):
-    print("Attaching events to the GUI...")
     # Menü sáv gombjainak kezelése
     attachToolbarEvents(ui)
     # Kép választásával kapcsolatos események
@@ -112,19 +112,27 @@ def onFileClosed(ui: QMainWindow, imagePreview: ImagePreview):
 # Akkor hívódik amikor a számolás indítására nyomunk
 def onCountClicked(ui: QMainWindow):
     ui.setEnabled(False)
+
+    #részeredmény mutató checkbox, állapot elkérése
+    showSubresCheckbox: QCheckBox = ui.showSubresultsCheckbox
+    showSubresults = showSubresCheckbox.isChecked()
+    pathLabel: QLabel = ui.imagePath
+    imagePath: str = pathLabel.text()
+
     QApplication.setOverrideCursor(Qt.WaitCursor)
     # számolás a HÁTTÉRBEN
-    thread = threading.Thread(target=executeCountingOperation, args=[ui])
+    thread = threading.Thread(target=executeCountingOperation, args=[ui, imagePath, showSubresults])
     thread.setDaemon(True)
     thread.start()
 
 # A számoló függvény ami a háttérben fut
-def executeCountingOperation(ui: QMainWindow):
+def executeCountingOperation(ui: QMainWindow, imagePath: str, showSubresults: bool):
     # időmérés indítása
     startTime = time.time()
-    # TODO: ez csak várakozik, helyette az igazik számolás kell!
-    time.sleep(2)
-    count = 3
+   
+    # számolás
+    count = algorithms.segment_count.dice_counter.count_dices(imagePath, showSubresults)
+
     # időmérés leállítása
     endTime = time.time()
     elapsed = round(endTime - startTime, 5)

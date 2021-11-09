@@ -18,6 +18,9 @@ def read_images(image_paths):
         images.append(image)
     return images
 
+def read_image(image_path: str):
+    return cv2.imread(image_path)
+
 def get_avg_image_size(images):
     avg_width, avg_height = 0, 0
     for image in images:

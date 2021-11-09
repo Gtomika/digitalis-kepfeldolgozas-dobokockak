@@ -1,11 +1,9 @@
-from image_utils import get_input_image_paths, read_images
+from . import image_utils
 import cv2
 from os import path
 import numpy as np
-from rectangle import Rectangle
-from cluster_k_means import count_value_k_means
-from cluster_hierarchical import count_value_hierarchical
-from brightness_based import count_value_brightness_based
+from . import rectangle
+from . import brightness_based
 
 """
 Források:
@@ -28,6 +26,8 @@ MODEL_PATH = path.join(fileDir, 'neural_network_parameters', 'frozen_inference_g
 CONFIG_PATH = path.join(fileDir, 'neural_network_parameters', 'mask_rcnn_inception_v2_coco_2018_01_28.pbtxt')
 # Kijelölőszínek, véletlen
 HIGHLIGHT_COLORS = np.random.randint(125, 255, (120, 3))
+# neurális háló betöltése
+model = cv2.dnn.readNetFromTensorflow(MODEL_PATH, CONFIG_PATH)
 
 # Előfeldolgozást végez a képen, majd visszaadja az előfeldolgozott 
 # képet, amit utána be lehet adni az algoritmusnak.
@@ -76,7 +76,7 @@ def segment_dices(model, preprocessed, index = 0, display = False):
         if score < 0.5:
             continue
         #print('Detected object with high confidence: ' + str(int(class_id)))
-        rect = Rectangle(int(box[3]*width), int(box[4]*height), int(box[5]*width), int(box[6]*height))
+        rect = rectangle.Rectangle(int(box[3]*width), int(box[4]*height), int(box[5]*width), int(box[6]*height))
         # befoglaló téglalap rajzolása az eredményképre
         cv2.rectangle(display_image, (rect.x, rect.y), (rect.width, rect.height), (255,0,0), 2)
         # maszk elkészítése visszaadáshoz
@@ -105,16 +105,34 @@ def segment_dices(model, preprocessed, index = 0, display = False):
         cv2.imshow(str(index) + '. image results', np.hstack([black_image, display_image]))    
     return object_masks
 
+# Ezt lehet meghívni a GUI-ból. 
+def count_dices(image_path: str, show_subresults: bool) -> int:
+    #beolvasás
+    image = image_utils.read_image(image_path)
+    # Átméretezés
+    image = cv2.resize(image, (650, 550))
+    # fényesítés
+    # alpha érték tologatásával lehet egyes képeken javítani, de nincs olyan ami mindenhol jó lenne
+    image = cv2.convertScaleAbs(image, alpha=1.2, beta=0)
+    # szegmentálás
+    object_masks = segment_dices(model, image, index=1, display=show_subresults)
+    # feldolgozás a számoláshoz, itt nem túl érdekes a kép ezért sosem mutatja
+    preprocessed = preprocess_image(image, index=1, display=False)
+    # Ez csinálja fényesség alapján a számolást
+    count = brightness_based.count_value_brightness_based(preprocessed, image, object_masks, index=1, display=show_subresults)
+    if(show_subresults):
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+    return count
+
+
 # Main függvény, itt lehet hívni az algoritmusokat
 if __name__ == '__main__':
     # Képek beolvasása és átméretezése
-    image_paths = get_input_image_paths(IMAGES_DIR)
-    print("Images: " + str(image_paths))
+    image_paths = image_utils.get_input_image_paths(IMAGES_DIR)
+    #print("Images: " + str(image_paths))
     
-    images = read_images(image_paths)
-    
-    # neurális háló betöltése
-    model = cv2.dnn.readNetFromTensorflow(MODEL_PATH, CONFIG_PATH)
+    images = image_utils.read_images(image_paths)
 
     # A képek feldolgozása
     for index, image in enumerate(images):
@@ -124,7 +142,6 @@ if __name__ == '__main__':
        # alpha érték tologatásával lehet egyes képeken javítani, de nincs olyan ami mindenhol jó lenne
        image = cv2.convertScaleAbs(image, alpha=1.2, beta=0)
        # szegmentálás, ha display-t True-ra állítjátok akkor mutat szép részeredmény képet
-       #object_masks = []
        object_masks = segment_dices(model, image, index, display=False)
        # Ezt ha futtatjátok, akkor mutatja az összes egyéni maszkolt objektumot.
        # Figyelem, ez elég sok ablakot hozhat fel.
@@ -140,7 +157,7 @@ if __name__ == '__main__':
        # Ez csinálja a hierarchikus klaasterezés módszerrel, nem túl jól
        #count = count_value_hierarchical(preprocessed, image, object_masks, index, display=True)
        # Ez csinálja fényesség alapján
-       count = count_value_brightness_based(preprocessed, image, object_masks, index, display=True)
+       count = brightness_based.count_value_brightness_based(preprocessed, image, object_masks, index, display=True)
        # Eredmény
        print(str(index) + '. kép értéke: ' + str(count))
 

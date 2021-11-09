@@ -61,9 +61,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>650</x>
       <y>500</y>
-      <width>171</width>
+      <width>131</width>
       <height>41</height>
      </rect>
     </property>
@@ -284,6 +284,19 @@
      </property>
     </widget>
    </widget>
+   <widget class="QCheckBox" name="showSubresultsCheckbox">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>510</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Részeredmény képek mutatása</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -291,7 +304,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGitHub">
