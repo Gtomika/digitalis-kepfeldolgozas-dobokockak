@@ -1,7 +1,7 @@
-from ntpath import join
+import time
 from PyQt5.QtWidgets import QCheckBox, QFileDialog, QLabel, QListWidget, QMainWindow, QProgressBar, QPushButton
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtCore import QDir
+from PyQt5.QtCore import QDir, QThread, QUrl, pyqtSignal
 import os
 import test
 
@@ -17,7 +17,7 @@ def attachEvents(ui: QMainWindow):
     launchTestButton.clicked.connect(lambda: onLaunchTestClicked(ui))
     # log mentés
     saveLogsButton: QPushButton = ui.saveLogsButton
-    saveLogsButton.clicked.connect(lambda: test.onSaveLogsClicked(ui)) 
+    saveLogsButton.clicked.connect(lambda: onSaveLogsClicked(ui)) 
 
 # a választott mappa útvonala, nem biztos hogy érvényes
 _folderPath: str = '-'
@@ -126,12 +126,114 @@ def findResultFile(folderPath: str) -> str:
         joined = os.path.join(folderPath, resultPath)
         return QDir.toNativeSeparators(joined)
 
+#amikor a háttérszál logolni akar ezt hívja
+def onLog(message: str, ui: QMainWindow):
+    logWidget: QListWidget = ui.testLogsWidget
+    logWidget.addItem(message)
+    logWidget.update()
+
+def onSuccess(count: int, ui: QMainWindow):
+    successLabel: QLabel = ui.successCountLabel
+    successLabel.setText(str(count))
+    successLabel.update()
+
+def onFail(count: int, ui: QMainWindow):
+    failLabel: QLabel = ui.failCountLabel
+    failLabel.setText(str(count))
+    failLabel.update()
+
+def onNotRun(count: int, ui: QMainWindow):
+    notRunLabel: QLabel = ui.notRunCountLabel
+    notRunLabel.setText(str(count))
+    notRunLabel.update()
+
+def displayResults(successPercentage: str, logs: list, ui: QMainWindow):
+    percentageLabel: QLabel = ui.successPercentageLabel
+    percentageLabel.setText(successPercentage)
+    # mentés gomb engedélyezése
+    saveLogsButton: QPushButton = ui.saveLogsButton
+    saveLogsButton.setEnabled(True)
+    launchButton: QPushButton = ui.launchTestButton
+    launchButton.setEnabled(True)
+    #logok mentése
+    global _logs
+    _logs = logs
+
+#PyQt5 szál osztály
+class TestRunner(QThread):
+
+    on_log_signal = pyqtSignal(str, QMainWindow)
+
+    on_success_signal = pyqtSignal(int, QMainWindow)
+
+    on_fail_signal = pyqtSignal(int, QMainWindow)
+
+    on_not_run_signal = pyqtSignal(int, QMainWindow)
+
+    on_display_results_signal = pyqtSignal(str, list, QMainWindow)
+
+    on_progress_signal = pyqtSignal(int, QMainWindow)
+
+    on_pre_signal = pyqtSignal(int, QMainWindow)
+
+    def __init__(self, ui: QMainWindow):
+        QThread.__init__(self)
+        self.ui = ui
+
+    def run(self):
+        test.runTests(_resultPath, _imagePaths, self.ui, self.on_log_signal, self.on_success_signal, self.on_fail_signal,
+                 self.on_not_run_signal, self.on_display_results_signal, self.on_progress_signal, self.on_pre_signal)
+
+def onPreTesting(max, ui: QMainWindow):
+    percentageLabel: QLabel = ui.successPercentageLabel
+    percentageLabel.setText('...')
+    launchButton: QPushButton = ui.launchTestButton
+    launchButton.setEnabled(False)
+    progressBar: QProgressBar = ui.progressBar
+    progressBar.setMinimum(0)
+    progressBar.setMaximum(max)
+    progressBar.setEnabled(True)
+    progressBar.setValue(0)
+
+def onProgress(counter: int, ui: QMainWindow):
+    progressBar: QProgressBar = ui.progressBar
+    progressBar.setValue(counter)
+    progressBar.update()
+
+_logs: list[str] = []
+
+# amikor a mentés gombra kattintunk, akkor az eredmények el lesznek mentve a választott fájlba
+def onSaveLogsClicked(ui: QMainWindow):
+    defaultName = QUrl.fromLocalFile('testlog_' + str(int(time.time())) + '.log')
+    logFile = QFileDialog.getSaveFileUrl(ui, caption='Log mentése', directory=defaultName, filter='Log fájlok (*.log)')
+    logFilePath = logFile[0].toLocalFile()
+    if(logFilePath == ''):
+        return
+    logFilePath = QDir.toNativeSeparators(logFilePath)
+    with open(logFilePath, 'w+') as f:
+        f.writelines(_logs)
+
+_testRunner = None
+
 # amikor a teszt indító gombot megnyomják, csak érvényes adatok esetén lehetséges
 def onLaunchTestClicked(ui: QMainWindow):
     clearTestResults(ui)
     progressBar: QProgressBar = ui.progressBar
     progressBar.setEnabled(True)
-    test.runTests(_resultPath, _imagePaths, ui)
+    global _testRunner
+    # szál létrehozása
+    _testRunner = TestRunner(ui)
+    # háttér események kapcsolása
+    _testRunner.on_log_signal.connect(onLog)
+    _testRunner.on_success_signal.connect(onSuccess)
+    _testRunner.on_fail_signal.connect(onFail)
+    _testRunner.on_not_run_signal.connect(onNotRun)
+    _testRunner.on_display_results_signal.connect(displayResults)
+    _testRunner.on_pre_signal.connect(onPreTesting)
+    _testRunner.on_progress_signal.connect(onProgress)
+    # indítás
+    _testRunner.start()
+    
 
 # törli a teszt eredményeket mutató rész tartalmát
 def clearTestResults(ui: QMainWindow):

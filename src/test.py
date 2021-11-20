@@ -1,8 +1,8 @@
-import os
 from pathlib import Path
-from PyQt5.QtCore import QDir, QUrl
+from PyQt5.QtCore import QDir, QThread, QUrl
 from PyQt5.QtWidgets import QFileDialog, QLabel, QListWidget, QMainWindow, QProgressBar, QPushButton
 import time
+from algorithms.segment_count.dice_counter import count_dices
 
 # egy kép neve és az arra elvárt eredmény
 class ExpectedResult:
@@ -13,28 +13,26 @@ class ExpectedResult:
 # a tesztek logjai, hogy később fájlba lehessen menteni
 _testLogs: list[str] = []
 
-# logokat mutat a felületen
-_logWidget: QListWidget
+_logSignal = None
 
-def runTests(resultFile: str, imagePaths: list[str], ui: QMainWindow):
+_ui = None
+
+def runTests(resultFile: str, imagePaths: list[str], ui: QMainWindow, logSignal, successSignal, failSignal, notRunSignal, displayResultSignal, progressSignal, preSignal):
+    preSignal.emit(len(imagePaths), ui)
     # időmérés 
     startTime = time.time()
     # logolás előkészítése
     global _testLogs
     _testLogs.clear()
-    global _logWidget
-    _logWidget = ui.testLogsWidget
+    global _logSignal
+    _logSignal = logSignal
+    global _ui
+    _ui = ui
     logStart(resultFile, len(imagePaths))
     # elvárt eredmények olvasása (NEM biztos, hogy minden képhez talált elvárt eredményt)
     log('Elvárt eredmények beolvasása az eredményfájlból...')
     expectedResults = readResults(resultFile)
     log('A ' + str(len(imagePaths)) + ' képből ' + str(len(expectedResults)) + ' darabhoz sikerült elvárt eredményt találni az eredményfájlban.')
-    # progress bar beállítása
-    progressBar: QProgressBar = ui.progressBar
-    progressBar.setMinimum(0)
-    progressBar.setMaximum(len(imagePaths))
-    progressBar.setEnabled(True)
-    progressBar.setValue(0)
     # végigmegy az összes képen, és teszteli őket
     log('Kezdődik a képek tesztelése...')
     success = 0
@@ -46,13 +44,17 @@ def runTests(resultFile: str, imagePaths: list[str], ui: QMainWindow):
         status = runTest(imagePath, expectedResults)
         if status == SUCCESS:
             success += 1
+            successSignal.emit(success, ui)
         elif status == FAIL:
             fail += 1
+            failSignal.emit(fail, ui)
         elif status == NOT_RUN:
             notRun += 1
+            notRunSignal.emit(notRun, ui)
         else: # nem fordul elő?
             notRun += 1
-        progressBar.setValue(counter)
+            notRunSignal.emit(notRun, ui)
+        progressSignal.emit(counter, ui)
         counter += 1
     # teszteredmények
     percentageNum = round(success / len(imagePaths), 2)
@@ -63,7 +65,7 @@ def runTests(resultFile: str, imagePaths: list[str], ui: QMainWindow):
     # eredmények logolása
     logResults(success, fail, notRun, successPercentage, elapsed)
     # eredmények mutatása az UI-n
-    diplayResults(ui, success, fail, notRun, successPercentage)
+    displayResultSignal.emit(successPercentage, _testLogs, ui)
 
 # eredmény konstansok
 SUCCESS = 0
@@ -77,9 +79,9 @@ def runTest(imagePath: str, expectedResults: list[ExpectedResult]) -> int:
         log('Ehhez a képhez nem található elvárt eredmény, ezért ki lesz hagyva.')
         return NOT_RUN
     try:
-        # TODO: itt kell beolvasni a képet és meghívni a tényleges kiértékelést!
-        # TODO: most mindenre csak 3 jön vissza, mint kapott eredmény
-        result = 3
+        # itt kell meghívni a számoló algoritmust
+        # ez nem mutat részeredményeket, az nagyon sok kép lenne minden tesztesetre
+        result = count_dices(imagePath, False)
     except Exception as e:
         log('Hiba a kép tesztelése közben: ' + str(e))
         return NOT_RUN
@@ -141,7 +143,7 @@ def getCurrentTimeString() -> str:
 # egy új logot jelenít meg (a log listához is hozzáírja)
 def log(message: str):
     _testLogs.append(getCurrentTimeString() + ': ' + message + '\n')
-    _logWidget.addItem(getCurrentTimeString() + ': ' + message)
+    _logSignal.emit(message, _ui)
 
 # teszt indítási információkat logol
 def logStart(resultPath: str, imageCount: int):
@@ -161,27 +163,3 @@ def logResults(success: int, fail: int, notRun: int, successPercentage: str, tim
         log('A sikertelen futtatás okaiért lásd a logokat.')
     log('Sikerességi százalék: ' + str(successPercentage))
     log('Tesztelés időtartama: ' + str(time) + ' másodperc.')
-
-def diplayResults(ui: QMainWindow, success: int, fail: int, notRun: int, successPercentage: str):
-    successLabel: QLabel = ui.successCountLabel
-    successLabel.setText(str(success))
-    failLabel: QLabel = ui.failCountLabel
-    failLabel.setText(str(fail))
-    notRunLabel: QLabel = ui.notRunCountLabel
-    notRunLabel.setText(str(notRun))
-    percentageLabel: QLabel = ui.successPercentageLabel
-    percentageLabel.setText(successPercentage)
-    # mentés gomb engedélyezése
-    saveLogsButton: QPushButton = ui.saveLogsButton
-    saveLogsButton.setEnabled(True)
-
-# amikor a mentés gombra kattintunk, akkor az eredmények el lesznek mentve a választott fájlba
-def onSaveLogsClicked(ui: QMainWindow):
-    defaultName = QUrl.fromLocalFile('testlog_' + str(int(time.time())) + '.log')
-    logFile = QFileDialog.getSaveFileUrl(ui, caption='Log mentése', directory=defaultName, filter='Log fájlok (*.log)')
-    logFilePath = logFile[0].toLocalFile()
-    if(logFilePath == ''):
-        return
-    logFilePath = QDir.toNativeSeparators(logFilePath)
-    with open(logFilePath, 'w+') as f:
-        f.writelines(_testLogs)

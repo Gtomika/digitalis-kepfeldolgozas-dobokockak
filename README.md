@@ -47,6 +47,10 @@ Tesztelő program futtatása:
 python test_main.py
 ```
 
+A tesztelő programban válasszuk az *img* mappát, mint tesztelendő mappa, mivel ebben találhatóak a képek 
+és az elvárt eredményt tartalmazó *result.txt*. Figyelem, a tesztelés hosszú időt vehet igénybe, 
+de a program közben kiírja a részeredményeket is.
+
 ### Feladatkiosztás
 
 Az itt látható részfeladatokat osztottuk fel egymás között.
