@@ -107,7 +107,7 @@ def segment_dices(model, preprocessed, index = 0, display = False):
 
 # Ezt lehet meghívni a GUI-ból. 
 def count_dices(image_path: str, show_subresults: bool) -> int:
-    #beolvasás
+    # beolvasás
     image = image_utils.read_image(image_path)
     # Átméretezés
     image = cv2.resize(image, (650, 550))
@@ -117,7 +117,9 @@ def count_dices(image_path: str, show_subresults: bool) -> int:
     # szegmentálás
     object_masks = segment_dices(model, image, index=1, display=show_subresults)
     # feldolgozás a számoláshoz, itt nem túl érdekes a kép ezért sosem mutatja
-    preprocessed = preprocess_image(image, index=1, display=False)
+    preprocessed_1 = preprocess_image(image, index=1, display=False)
+    struct = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    preprocessed = cv2.dilate(preprocessed_1, struct, iterations=1) # a színes kockák esetén segít a pöttyök foltjának kitágításán, hogy detektálható legyen
     # Ez csinálja fényesség alapján a számolást
     count = brightness_based.count_value_brightness_based(preprocessed, image, object_masks, index=1, display=show_subresults)
     if(show_subresults):
