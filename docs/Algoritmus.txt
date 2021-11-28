@@ -34,6 +34,31 @@ Körök detektálása:
 	HoughCircle
 	findContours
 
-Harmadik verzió (végleges):
+Harmadik verzió:
 
 A számoló algoritmusunk, még nem teljes, de röviden a következőképpen működik. A program először a körök detektálását végezné el, majd a köröket csoportosítja egymástól való távolságuk alapján, így meghatározva a különböző lapjait a kockáknak. Ezt követően a program úgy határozza meg a két dobókocka felső lapjait, hogy a csoportosított pontok közül kiválasztja azokat melyek középpontjai a legmagasabb pozícióban találhatóak. Végezetül megszámolja a két felső lap pontjait.
+
+
+Végleges verzió:
+
+BEMENET:
+    - a kép elérési útvonala
+    - egy bool, ami ha igaz, akkor mutatja a részeredményeket is program
+KIMENET: egy szám, ami megmondja (ideális esetben), hogy mennyi a kockák felső lapjainak összege
+
+1. A kép beolvasása
+2. A kép átméretezése fix 650x550 méretre
+3. Kontraszt növelése, mivel ez javítja mind az objektum detektálást, mind a 
+    fényesség alapú módszert (ezeket lásd később)
+4. Objektum detektálás neurális hálóval.
+    - Objektum szegmentáló háló GitHub: https://github.com/matterport/Mask_RCNN
+    - Objektum szegmentáló háló cikk: https://machinelearningknowledge.ai/instance-segmentation-using-mask-rcnn-in-opencv-python/
+5. A kép további feldolgozása, előkészítve a fényesség alapú módszert:
+    - Szürkeárnyalatossá alakítás
+    - Erózió 3x3 elemmel
+    - Gauss homályosítás
+6. A fényesség alapú számolás, minden detektált objektumra
+    - CÉL: meg kell mondani a szegmentált objektumokon, hogy melyik a felső kockalap
+    - FELTÉTEL: a legfényesebb lap a felső
+    - A kocka legfényesebb tartományába eső "foltokat" számolja az OpenCV blob detector 
+        függvénynének segítségével
