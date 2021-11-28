@@ -57,7 +57,7 @@ def runTests(resultFile: str, imagePaths: list[str], ui: QMainWindow, logSignal,
         progressSignal.emit(counter, ui)
         counter += 1
     # teszteredmények
-    percentageNum = round(success / len(imagePaths), 2)
+    percentageNum = round(success / (success+fail), 2)
     successPercentage = str(percentageNum * 100) + '%'
     # időmérés vége
     endTime = time.time()
